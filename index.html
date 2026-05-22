@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CGS — Channel Growth Strategies</title>
+  <meta name="description" content="Channel coaching and go-to-market strategy for companies ready to scale. Two decades of experience, founder-led engagements." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: auto; }
+    body { font-family: 'DM Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    button { font-family: inherit; }
+    a { color: inherit; }
+    textarea { font-family: inherit; }
+    button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
+      outline: 2px solid currentColor; outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script src="project/image-slot.js"></script>
+
+  <script type="text/babel">
+
+// ── Palette ──────────────────────────────────────────────────────────────────
+const SHARED = {
+  accent:    '#2f5d3a',
+  accent2:   '#c8983b',
+  cardBg:    '#f6f3ea',
+  cardFg:    '#1c2118',
+  cardMuted: 'rgba(28,33,24,.62)',
+  deepBg:    '#13180f',
+  deepFg:    '#f6f3ea',
+  deepFgRgb: '246,243,234',
+};
+
+function getPalette(dark) {
+  const mode = dark
+    ? { bg: '#13180f', fg: '#f6f3ea', muted: 'rgba(246,243,234,.62)', border: 'rgba(246,243,234,.12)', subtle: 'rgba(246,243,234,.06)', ink: '#f6f3ea' }
+    : { bg: '#f6f3ea', fg: '#1c2118', muted: 'rgba(28,33,24,.62)',    border: 'rgba(28,33,24,.14)',    subtle: 'rgba(28,33,24,.04)',    ink: '#1c2118' };
+  return { ...SHARED, ...mode, cream: SHARED.deepFg, creamRgb: SHARED.deepFgRgb };
+}
+
+// ── Content ───────────────────────────────────────────────────────────────────
+const NAV_ITEMS = [
+  { id: 'about',        label: 'About' },
+  { id: 'capabilities', label: 'Capabilities' },
+  { id: 'beliefs',      label: 'Beliefs' },
+];
+
+const WHO_WE_ARE = [
+  "CGS is a consulting practice with two decades of experience in channel development and go-to-market strategy.",
+  "We work with leadership teams to design, launch, and tune the channel programs that drive durable revenue — combining direct operating experience with a coach's perspective on the work.",
+];
+
+const WHAT_WE_DO = [
+  { t: 'Channel development', d: 'Design and optimization of channel structures across distribution, VAR, retail, and enterprise.' },
+  { t: 'Partner programs',    d: 'Tiering, enablement, incentives, and partner-success frameworks that scale without burning margin.' },
+  { t: 'Market analysis',     d: 'Segmentation, sizing, and growth-strategy work that names the next 12 months, not just the next quarter.' },
+  { t: 'Performance & metrics', d: 'KPI architecture, partner-health scoring, and the cadence to actually run the program week over week.' },
+];
+
+const BRYAN = {
+  bio: "Bryan is a sales and marketing leader with a track record building and managing channel sales teams and marketing programs at Wasp Barcode Technologies and Opengear. He has designed and run go-to-market motions across direct, corporate, retail, VAR, distribution, e-commerce, and enterprise — driving revenue growth, building durable partnerships, and navigating complex sales landscapes to deliver measurable results.",
+  expertise: [
+    'Business development', 'Business process management', 'Cloud solutions',
+    'Contract negotiations', 'Global sales & product line expansion', 'Marketing strategy',
+    'Partner development', 'SaaS enterprise software', 'Strategic partnerships',
+    'Team building', 'Team management',
+  ],
+};
+
+const STATS = [
+  { n: '20+', l: 'Years in channel' },
+  { n: '7',   l: 'Channel segments served' },
+  { n: '11',  l: 'Areas of expertise' },
+  { n: '1:1', l: 'Founder-led engagements' },
+];
+
+const CONTACT = {
+  email:    'hello@cgs-llc.com',
+  linkedin: 'in/bryan-keepers',
+  location: 'Dallas, TX · Available across the Americas',
+};
+
+const MISSION = 'To become the most trusted channel coaching and training business in the Americas.';
+const VALUES   = 'We treat our clients and community with honor, respect, and authenticity. We work hard for our clients and aim to serve teammates and clients beyond what is typically expected in a business relationship. Growth and improvement are what make life and business exciting.';
+
+// ── Type style objects ────────────────────────────────────────────────────────
+const display = { fontFamily: '"Bricolage Grotesque", system-ui, sans-serif', letterSpacing: '-0.025em', fontWeight: 700 };
+const sans    = { fontFamily: '"DM Sans", system-ui, sans-serif' };
+const mono    = { fontFamily: '"JetBrains Mono", ui-monospace, monospace' };
+
+// ── Scroll utility ────────────────────────────────────────────────────────────
+function scrollTo(id) {
+  const el = document.querySelector(`[data-sec="${id}"]`);
+  if (!el) return;
+  const top = el.getBoundingClientRect().top + window.scrollY - 80;
+  window.scrollTo({ top, behavior: 'smooth' });
+}
+
+// ── Marker ────────────────────────────────────────────────────────────────────
+function Marker({ n, color }) {
+  return (
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, ...mono, fontSize: 11.5, letterSpacing: '.1em', textTransform: 'uppercase', color, marginBottom: 22 }}>
+      <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="0.5" y="0.5" width="13" height="13" fill={color} /></svg>
+      <span>{n}</span>
+    </div>
+  );
+}
+
+// ── Button ────────────────────────────────────────────────────────────────────
+function Btn({ children, primary, accent2, onClick, p }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        ...sans, cursor: 'pointer',
+        background: primary ? p.accent : accent2 ? p.accent2 : 'transparent',
+        color: primary || accent2 ? p.cream : p.fg,
+        border: primary || accent2 ? 'none' : `1.5px solid ${p.ink}`,
+        padding: '15px 26px', borderRadius: 2,
+        fontSize: 15, fontWeight: 600, letterSpacing: '-0.005em',
+        display: 'inline-flex', alignItems: 'center', gap: 10,
+        transition: 'transform .12s, box-shadow .15s',
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = `4px 4px 0 ${p.ink}`; }}
+      onMouseLeave={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
+    >
+      {children}
+    </button>
+  );
+}
+
+// ── Step (track record) ───────────────────────────────────────────────────────
+function Step({ label, sub, active, p }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+      <div style={{ width: 12, height: 12, marginTop: 4, flexShrink: 0, background: active ? p.accent : 'transparent', border: `1.5px solid ${active ? p.accent : p.ink}` }} />
+      <div>
+        <div style={{ ...sans, fontSize: 14, fontWeight: 600, lineHeight: 1.2, color: p.fg }}>{label}</div>
+        <div style={{ ...sans, fontSize: 12.5, color: p.muted, marginTop: 2 }}>{sub}</div>
+      </div>
+    </div>
+  );
+}
+
+// ── Contact info row ──────────────────────────────────────────────────────────
+function ContactRow({ label, value, p }) {
+  return (
+    <div style={{ padding: '18px 22px', border: `1px solid rgba(${p.deepFgRgb},.2)`, display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <span style={{ ...mono, fontSize: 10.5, letterSpacing: '.14em', textTransform: 'uppercase', color: `rgba(${p.deepFgRgb},.55)` }}>{label}</span>
+      <span style={{ ...sans, fontSize: 16, fontWeight: 500, color: p.cream }}>{value}</span>
+    </div>
+  );
+}
+
+// ── Form field ────────────────────────────────────────────────────────────────
+function Field({ label, value, onChange, multiline, type = 'text', p }) {
+  const [focused, setFocused] = React.useState(false);
+  const common = {
+    width: '100%', background: 'rgba(0,0,0,.02)', color: p.fg,
+    border: `1px solid ${focused ? p.accent : p.border}`, borderRadius: 2,
+    padding: '11px 12px', ...sans, fontSize: 14, lineHeight: 1.4,
+    outline: 'none', transition: 'border-color .15s',
+  };
+  return (
+    <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <span style={{ fontSize: 12, color: p.muted, ...mono, letterSpacing: '.06em', textTransform: 'uppercase' }}>{label}</span>
+      {multiline
+        ? <textarea rows={4} value={value} onChange={(e) => onChange(e.target.value)} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} style={{ ...common, resize: 'vertical' }} />
+        : <input type={type} value={value} onChange={(e) => onChange(e.target.value)} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} style={common} />
+      }
+    </label>
+  );
+}
+
+// ── Contact modal ─────────────────────────────────────────────────────────────
+function ContactModal({ open, onClose, p }) {
+  const [form, setForm]   = React.useState({ name: '', email: '', company: '', message: '' });
+  const [sent, setSent]   = React.useState(false);
+  const [err,  setErr]    = React.useState('');
+
+  React.useEffect(() => {
+    if (!open) { setSent(false); setErr(''); setForm({ name: '', email: '', company: '', message: '' }); return; }
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
+
+  if (!open) return null;
+
+  const upd = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) { setErr('Please add your name, email, and a short message.'); return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.trim())) { setErr('Please use a valid email address.'); return; }
+    setSent(true); setErr('');
+  };
+
+  return ReactDOM.createPortal(
+    <div onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(20,18,14,.45)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+      <div style={{ width: 'min(560px, 100%)', background: p.bg, color: p.fg, border: `1px solid ${p.border}`, borderRadius: 4, padding: '28px 32px 32px', ...sans, boxShadow: '0 30px 80px rgba(0,0,0,.35)', position: 'relative' }}>
+        <button onClick={onClose} aria-label="Close" style={{ position: 'absolute', top: 14, right: 14, width: 32, height: 32, borderRadius: 16, border: 'none', background: 'transparent', color: p.muted, fontSize: 18, cursor: 'pointer' }}>×</button>
+
+        {!sent ? (<>
+          <div style={{ ...mono, fontSize: 11, letterSpacing: '.12em', textTransform: 'uppercase', color: p.accent, marginBottom: 10 }}>Get in touch</div>
+          <h3 style={{ ...display, fontWeight: 600, fontSize: 26, lineHeight: 1.15, margin: '0 0 6px', letterSpacing: '-0.02em' }}>Tell us about your channel.</h3>
+          <p style={{ margin: '0 0 20px', color: p.muted, fontSize: 14, lineHeight: 1.55 }}>
+            Share a little about where you are today and what you're trying to unlock. Bryan replies personally, usually within a business day.
+          </p>
+          <form onSubmit={submit} style={{ display: 'grid', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <Field label="Name"  value={form.name}  onChange={upd('name')}  p={p} />
+              <Field label="Email" value={form.email} onChange={upd('email')} type="email" p={p} />
+            </div>
+            <Field label="Company"                value={form.company}  onChange={upd('company')}  p={p} />
+            <Field label="What are you working on?" value={form.message} onChange={upd('message')} multiline p={p} />
+            {err && <div style={{ fontSize: 13, color: '#b3261e' }}>{err}</div>}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
+              <span style={{ fontSize: 12, color: p.muted }}>Or email <a href={`mailto:${CONTACT.email}`} style={{ color: p.fg, textDecoration: 'underline', textUnderlineOffset: 3 }}>{CONTACT.email}</a></span>
+              <button type="submit" style={{ background: p.accent, color: '#fff', border: 'none', padding: '12px 22px', borderRadius: 2, ...sans, fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>Send message →</button>
+            </div>
+          </form>
+        </>) : (
+          <div style={{ padding: '20px 0 8px' }}>
+            <div style={{ ...mono, fontSize: 11, letterSpacing: '.12em', textTransform: 'uppercase', color: p.accent, marginBottom: 10 }}>Message sent</div>
+            <h3 style={{ ...display, fontWeight: 500, fontSize: 28, lineHeight: 1.15, margin: '0 0 10px', letterSpacing: '-0.01em' }}>Thanks, {form.name.split(' ')[0]}.</h3>
+            <p style={{ margin: '0 0 24px', color: p.muted, fontSize: 15, lineHeight: 1.55 }}>
+              Bryan will read this himself and reply within a business day. If it's urgent, reach him at <a href={`mailto:${CONTACT.email}`} style={{ color: p.fg }}>{CONTACT.email}</a>.
+            </p>
+            <button onClick={onClose} style={{ background: 'transparent', color: p.fg, border: `1px solid ${p.border}`, padding: '10px 18px', borderRadius: 2, ...sans, fontWeight: 500, fontSize: 14, cursor: 'pointer' }}>Close</button>
+          </div>
+        )}
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+// ── Bryan portrait (drop zone) ────────────────────────────────────────────────
+function BryanPortrait() {
+  const mask = 'radial-gradient(ellipse 78% 90% at 50% 38%, #000 45%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0) 100%)';
+  return (
+    <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', WebkitMaskImage: mask, maskImage: mask }}>
+      <image-slot id="bryan-portrait" shape="rect" radius="0" fit="contain" position="50% 30%" placeholder="Drop a portrait of Bryan" style={{ width: '100%', height: '100%', display: 'block' }} />
+    </div>
+  );
+}
+
+// ── Dark mode toggle icon ─────────────────────────────────────────────────────
+function DarkIcon({ dark }) {
+  return dark
+    ? <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    : <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>;
+}
+
+// ── App ───────────────────────────────────────────────────────────────────────
+function App() {
+  const [dark,        setDark]        = React.useState(false);
+  const [contactOpen, setContactOpen] = React.useState(false);
+  const [activeSection, setActive]   = React.useState('top');
+  const [bryanOpen,   setBryanOpen]  = React.useState(false);
+
+  const p   = getPalette(dark);
+  const pad = 76;
+  const gap = 124;
+
+  // Sync body background so there's no flash of wrong color
+  React.useLayoutEffect(() => { document.body.style.background = p.bg; }, [dark]);
+
+  // Scroll-spy
+  React.useEffect(() => {
+    const ids = ['top', 'about', 'capabilities', 'beliefs', 'contact'];
+    const check = () => {
+      const y = window.scrollY + 120;
+      let cur = 'top';
+      for (const id of ids) {
+        const el = document.querySelector(`[data-sec="${id}"]`);
+        if (el && el.offsetTop <= y) cur = id;
+      }
+      setActive(cur);
+    };
+    window.addEventListener('scroll', check, { passive: true });
+    check();
+    return () => window.removeEventListener('scroll', check);
+  }, []);
+
+  return (
+    <div style={{ background: p.bg, color: p.fg, ...sans, fontSize: 16, lineHeight: 1.5, minWidth: 1024 }}>
+
+      {/* ── NAV ─────────────────────────────────────────────────────────── */}
+      <header style={{ position: 'sticky', top: 0, zIndex: 30, background: p.bg, borderBottom: `1.5px solid ${p.ink}`, padding: `14px ${pad}px`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <button onClick={() => scrollTo('top')} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, color: p.fg }}>
+          <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+            <rect x="2"  y="2"  width="14" height="14" fill={p.accent} />
+            <rect x="18" y="2"  width="14" height="14" fill={p.ink} />
+            <rect x="2"  y="18" width="14" height="14" fill={p.ink} />
+            <rect x="18" y="18" width="14" height="14" fill={p.accent2} />
+          </svg>
+          <span style={{ ...display, fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em' }}>CGS<span style={{ color: p.accent }}>.</span></span>
+        </button>
+
+        <nav style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {NAV_ITEMS.map((n) => (
+            <button key={n.id} onClick={() => scrollTo(n.id)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '8px 14px', ...sans, fontSize: 14.5, fontWeight: 600, color: activeSection === n.id ? p.accent : p.fg, transition: 'color .15s', position: 'relative' }}>
+              {n.label}
+              {activeSection === n.id && <span style={{ position: 'absolute', bottom: 2, left: 14, right: 14, height: 2, background: p.accent }} />}
+            </button>
+          ))}
+          <button onClick={() => setDark((d) => !d)} aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px 10px', color: p.muted, display: 'flex', alignItems: 'center', borderRadius: 6, transition: 'color .15s' }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = p.fg)}
+            onMouseLeave={(e) => (e.currentTarget.style.color = p.muted)}>
+            <DarkIcon dark={dark} />
+          </button>
+          <div style={{ width: 8 }} />
+          <Btn primary onClick={() => setContactOpen(true)} p={p}>Get in touch →</Btn>
+        </nav>
+      </header>
+
+      {/* ── HERO ────────────────────────────────────────────────────────── */}
+      <section data-sec="top" style={{ padding: `${pad - 10}px ${pad}px ${pad}px`, position: 'relative' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 60, alignItems: 'end' }}>
+          <div>
+            <Marker n="Channel · Strategy · Coaching" color={p.accent} />
+            <h1 style={{ ...display, fontSize: 132, lineHeight: 0.9, fontWeight: 800, margin: '0 0 32px', letterSpacing: '-0.045em' }}>
+              <span>Channel</span><br />
+              <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 16 }}>
+                <span style={{ color: p.accent }}>growth</span>
+                <svg width="120" height="80" viewBox="0 0 120 80" aria-hidden="true" style={{ flexShrink: 0 }}>
+                  <path d="M5 70 Q 35 5, 60 40 T 115 10" fill="none" stroke={p.accent2} strokeWidth="6" strokeLinecap="square" />
+                  <circle cx="115" cy="10" r="6" fill={p.accent2} />
+                </svg>
+              </span><br />
+              <span style={{ fontStyle: 'italic', fontWeight: 500 }}>that lasts.</span>
+            </h1>
+            <p style={{ ...sans, fontSize: 21, lineHeight: 1.45, color: p.muted, maxWidth: 600, margin: '0 0 40px' }}>
+              Two decades of channel and go-to-market experience, applied as a coach. Programs that drive measurable revenue, partnerships built to last, and a team that knows how to run it after we're gone.
+            </p>
+            <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
+              <Btn primary onClick={() => setContactOpen(true)} p={p}>Book a session →</Btn>
+              <Btn onClick={() => scrollTo('capabilities')} p={p}>What we do</Btn>
+            </div>
+          </div>
+
+          {/* geometric stack */}
+          <div style={{ position: 'relative', height: 460 }}>
+            <div style={{ position: 'absolute', top: 0, right: 0, width: 280, height: 280, background: p.accent, transform: 'rotate(-3deg)' }} />
+            <div style={{ position: 'absolute', top: 40, right: 40, width: 280, height: 280, background: p.ink, transform: 'rotate(2deg)' }} />
+            <div style={{ position: 'absolute', top: 80, right: 80, width: 280, height: 280, background: p.bg, border: `1.5px solid ${p.ink}`, transform: 'rotate(-1deg)', padding: 24, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ ...mono, fontSize: 10.5, letterSpacing: '.14em', textTransform: 'uppercase', color: p.muted, marginBottom: 6 }}>Engagement model</div>
+                <div style={{ ...display, fontSize: 36, fontWeight: 700, lineHeight: 1, color: p.ink, letterSpacing: '-0.025em' }}>1 : 1</div>
+                <div style={{ ...sans, fontSize: 14, color: p.muted, marginTop: 4 }}>Founder-led, every engagement.</div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, ...mono, fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', color: p.accent }}>
+                <span style={{ width: 8, height: 8, background: p.accent, borderRadius: 4, boxShadow: `0 0 0 4px ${p.accent}33`, display: 'inline-block' }} />
+                Accepting Q3 engagements
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* stat band */}
+        <div style={{ marginTop: 84, display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', background: p.deepBg, color: p.deepFg }}>
+          {STATS.map((s, i) => (
+            <div key={s.l} style={{ padding: '32px 28px', borderLeft: i === 0 ? 'none' : `1px solid rgba(${p.deepFgRgb},.18)` }}>
+              <div style={{ ...display, fontSize: 56, fontWeight: 800, lineHeight: 1, marginBottom: 8, letterSpacing: '-0.03em', color: i === 1 ? p.accent2 : p.deepFg }}>{s.n}</div>
+              <div style={{ ...mono, fontSize: 11, letterSpacing: '.12em', textTransform: 'uppercase', color: `rgba(${p.deepFgRgb},.62)` }}>{s.l}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── ABOUT ───────────────────────────────────────────────────────── */}
+      <section data-sec="about" style={{ padding: `${gap}px ${pad}px`, position: 'relative' }}>
+        <Marker n="01 / Who we are" color={p.accent} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 60, alignItems: 'start', marginBottom: 72 }}>
+          <h2 style={{ ...display, fontSize: 72, lineHeight: 0.98, margin: 0, fontWeight: 700, letterSpacing: '-0.03em' }}>
+            We don't do<br />slide decks. We<br />do the <span style={{ color: p.accent }}>work</span>.
+          </h2>
+          <div style={{ paddingTop: 14 }}>
+            {WHO_WE_ARE.map((para, i) => (
+              <p key={i} style={{ ...sans, fontSize: 18, lineHeight: 1.55, margin: '0 0 20px', color: i === 0 ? p.fg : p.muted }}>{para}</p>
+            ))}
+          </div>
+        </div>
+
+        {/* Bryan strip */}
+        <div style={{ border: `1.5px solid ${p.ink}`, background: p.bg }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr auto', alignItems: 'stretch' }}>
+            {/* portrait */}
+            <div style={{ aspectRatio: '1/1', position: 'relative', background: p.bg }}>
+              <BryanPortrait />
+              <div style={{ position: 'absolute', top: 14, left: 14, zIndex: 2, ...mono, fontSize: 10, letterSpacing: '.14em', textTransform: 'uppercase', background: p.deepBg, color: p.deepFg, padding: '4px 8px' }}>Founder</div>
+            </div>
+            {/* bio */}
+            <div style={{ padding: '32px 36px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div style={{ ...mono, fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: p.accent, marginBottom: 8 }}>Meet</div>
+              <h3 style={{ ...display, fontSize: 44, fontWeight: 700, margin: '0 0 12px', letterSpacing: '-0.025em' }}>Bryan Keepers</h3>
+              <p style={{ ...sans, fontSize: 15.5, lineHeight: 1.6, color: p.muted, margin: 0, maxWidth: 600 }}>
+                {bryanOpen ? BRYAN.bio : `${BRYAN.bio.slice(0, 200)}…`}
+              </p>
+              <button onClick={() => setBryanOpen((o) => !o)} style={{ background: 'transparent', border: 'none', padding: 0, marginTop: 14, ...sans, fontSize: 14, fontWeight: 600, color: p.accent, cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 4, alignSelf: 'flex-start' }}>
+                {bryanOpen ? '— Show less' : '+ Read full bio'}
+              </button>
+            </div>
+            {/* track record */}
+            <div style={{ borderLeft: `1.5px solid ${p.ink}`, padding: '24px 28px', background: p.subtle, minWidth: 280 }}>
+              <div style={{ ...mono, fontSize: 10.5, letterSpacing: '.14em', textTransform: 'uppercase', color: p.muted, marginBottom: 16 }}>Track record</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <Step label="Wasp Barcode Technologies" sub="Channel sales & marketing" p={p} />
+                <Step label="Opengear" sub="Global channel programs" p={p} />
+                <Step label="CGS, LLC" sub="Founder · 2024–" active p={p} />
+              </div>
+            </div>
+          </div>
+
+          {/* expertise band */}
+          <div style={{ borderTop: `1.5px solid ${p.ink}`, padding: '24px 36px', background: p.deepBg, color: p.deepFg }}>
+            <div style={{ ...mono, fontSize: 10.5, letterSpacing: '.14em', textTransform: 'uppercase', color: `rgba(${p.deepFgRgb},.55)`, marginBottom: 14 }}>Areas of expertise · 11</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {BRYAN.expertise.map((e, i) => (
+                <span key={e} style={{ ...sans, fontSize: 13.5, padding: '6px 14px', background: i % 4 === 0 ? p.accent : i % 4 === 2 ? p.accent2 : 'transparent', color: p.deepFg, border: i % 4 === 0 || i % 4 === 2 ? 'none' : `1px solid rgba(${p.deepFgRgb},.3)`, borderRadius: 2, fontWeight: 500 }}>{e}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CAPABILITIES ─────────────────────────────────────────────────── */}
+      <section data-sec="capabilities" style={{ padding: `${gap}px ${pad}px`, background: p.accent, color: p.cream, position: 'relative', overflow: 'hidden' }}>
+        <svg width="320" height="320" viewBox="0 0 100 100" style={{ position: 'absolute', top: -40, right: -40, opacity: .15 }} aria-hidden="true">
+          {[49, 38, 27, 16].map((r) => <circle key={r} cx="50" cy="50" r={r} fill="none" stroke={p.cream} strokeWidth="0.4" />)}
+        </svg>
+        <div style={{ position: 'relative' }}>
+          <Marker n="02 / Capabilities" color={p.cream} />
+          <h2 style={{ ...display, fontSize: 80, lineHeight: 0.98, fontWeight: 700, margin: '0 0 18px', maxWidth: 1000, letterSpacing: '-0.035em' }}>Four ways<br />we get to work.</h2>
+          <p style={{ ...sans, fontSize: 18, lineHeight: 1.5, color: `rgba(${p.creamRgb},.85)`, maxWidth: 580, margin: '0 0 64px' }}>
+            Every engagement is sized to the moment — these are the four practice areas, often blended two or three at a time depending on where the program is in its lifecycle.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 24 }}>
+            {WHAT_WE_DO.map((c, i) => (
+              <div key={c.t} style={{ background: p.cardBg, color: p.cardFg, padding: '32px 32px 28px', minHeight: 220, display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <span style={{ ...display, fontSize: 56, fontWeight: 800, lineHeight: 1, color: p.accent, letterSpacing: '-0.02em' }}>0{i + 1}</span>
+                  <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+                    {i === 0 && <path d="M4 28 L28 4 M18 4 L28 4 L28 14" fill="none" stroke={p.cardFg} strokeWidth="2" strokeLinecap="square" />}
+                    {i === 1 && <><circle cx="8" cy="8" r="3" fill={p.cardFg} /><circle cx="24" cy="8" r="3" fill={p.cardFg} /><circle cx="8" cy="24" r="3" fill={p.cardFg} /><circle cx="24" cy="24" r="3" fill={p.cardFg} /><path d="M8 8 L24 24 M24 8 L8 24" stroke={p.cardFg} strokeWidth="1.5" /></>}
+                    {i === 2 && <><rect x="4" y="20" width="6" height="8" fill={p.cardFg} /><rect x="13" y="12" width="6" height="16" fill={p.cardFg} /><rect x="22" y="4" width="6" height="24" fill={p.cardFg} /></>}
+                    {i === 3 && <><circle cx="16" cy="16" r="12" fill="none" stroke={p.cardFg} strokeWidth="2" /><path d="M16 16 L16 6 M16 16 L25 21" stroke={p.cardFg} strokeWidth="2" strokeLinecap="square" /></>}
+                  </svg>
+                </div>
+                <h3 style={{ ...display, fontSize: 26, fontWeight: 700, margin: '0 0 12px', letterSpacing: '-0.018em' }}>{c.t}</h3>
+                <p style={{ ...sans, fontSize: 15, color: p.cardMuted, lineHeight: 1.6, margin: 0 }}>{c.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── BELIEFS ──────────────────────────────────────────────────────── */}
+      <section data-sec="beliefs" style={{ padding: `${gap}px ${pad}px` }}>
+        <Marker n="03 / Beliefs" color={p.accent} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', border: `1.5px solid ${p.ink}` }}>
+          <div style={{ padding: '40px 40px 48px', borderRight: `1.5px solid ${p.ink}`, background: p.accent2, color: p.cream }}>
+            <div style={{ ...mono, fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', marginBottom: 22, opacity: .8 }}>Mission</div>
+            <p style={{ ...display, fontSize: 38, lineHeight: 1.12, margin: 0, fontWeight: 700, letterSpacing: '-0.02em' }}>{MISSION}</p>
+          </div>
+          <div style={{ padding: '40px 40px 48px' }}>
+            <div style={{ ...mono, fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: p.accent, marginBottom: 22 }}>Values</div>
+            <p style={{ ...sans, fontSize: 17, lineHeight: 1.65, margin: 0, color: p.fg }}>{VALUES}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CONTACT ──────────────────────────────────────────────────────── */}
+      <section data-sec="contact" style={{ padding: `${gap}px ${pad}px ${pad}px`, background: p.deepBg, color: p.deepFg, position: 'relative', overflow: 'hidden' }}>
+        <svg width="220" height="220" viewBox="0 0 100 100" style={{ position: 'absolute', bottom: -40, left: pad - 40, opacity: .12 }} aria-hidden="true">
+          <rect x="2"  y="2"  width="46" height="46" fill={p.cream} />
+          <rect x="52" y="2"  width="46" height="46" fill="none" stroke={p.cream} strokeWidth="1" />
+          <rect x="2"  y="52" width="46" height="46" fill="none" stroke={p.cream} strokeWidth="1" />
+          <rect x="52" y="52" width="46" height="46" fill={p.cream} />
+        </svg>
+        <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 64, alignItems: 'end' }}>
+          <div>
+            <Marker n="04 / Get in touch" color={p.accent} />
+            <h2 style={{ ...display, fontSize: 108, lineHeight: 0.94, fontWeight: 800, margin: '0 0 24px', letterSpacing: '-0.04em' }}>
+              Let's<br /><span style={{ color: p.accent }}>build</span> something.
+            </h2>
+            <p style={{ ...sans, fontSize: 19, lineHeight: 1.5, color: `rgba(${p.creamRgb},.7)`, margin: '0 0 36px', maxWidth: 500 }}>
+              A 30-minute working session, no slides. Bring the parts of the program you're not sure about.
+            </p>
+            <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
+              <Btn primary onClick={() => setContactOpen(true)} p={p}>Start a conversation →</Btn>
+              <Btn accent2 onClick={() => window.open(`mailto:${CONTACT.email}`, '_blank')} p={p}>{CONTACT.email}</Btn>
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <ContactRow label="Email"    value={CONTACT.email}    p={p} />
+            <ContactRow label="LinkedIn" value={CONTACT.linkedin} p={p} />
+            <ContactRow label="Based in" value={CONTACT.location} p={p} />
+          </div>
+        </div>
+      </section>
+
+      {/* ── FOOTER ───────────────────────────────────────────────────────── */}
+      <footer style={{ padding: `30px ${pad}px`, background: p.deepBg, color: `rgba(${p.deepFgRgb},.6)`, borderTop: `1px solid rgba(${p.deepFgRgb},.15)`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', ...mono, fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase' }}>
+        <span>Channel Growth Strategies, LLC</span>
+        <span>© {new Date().getFullYear()}</span>
+      </footer>
+
+      <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} p={p} />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
