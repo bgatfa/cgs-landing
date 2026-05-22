@@ -20,6 +20,46 @@
     button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
       outline: 2px solid currentColor; outline-offset: 2px;
     }
+
+    /* ── Responsive grid layout classes ─────────────────────────────────── */
+    .grid-hero    { display: grid; grid-template-columns: 1.5fr 1fr; align-items: end; }
+    .grid-about   { display: grid; grid-template-columns: 1.3fr 1fr; align-items: start; }
+    .grid-stats   { display: grid; grid-template-columns: repeat(4, 1fr); }
+    .grid-bryan   { display: grid; grid-template-columns: 280px 1fr auto; align-items: stretch; }
+    .grid-caps    { display: grid; grid-template-columns: repeat(2, 1fr); }
+    .grid-beliefs { display: grid; grid-template-columns: 1fr 1fr; }
+    .grid-contact { display: grid; grid-template-columns: 1.4fr 1fr; align-items: end; }
+
+    .hero-visual       { position: relative; height: 460px; }
+    .track-record-col  { border-left: 1.5px solid var(--ink); padding: 24px 28px; min-width: 280px; }
+    .beliefs-border    { border-right: 1.5px solid var(--ink); }
+    .nav-links         { display: flex; align-items: center; gap: 6px; }
+    .hamburger-btn     { display: none; align-items: center; justify-content: center; }
+
+    @media (max-width: 1023px) {
+      .grid-hero    { grid-template-columns: 1fr; }
+      .grid-about   { grid-template-columns: 1fr; }
+      .grid-contact { grid-template-columns: 1fr; }
+      .hero-visual  { display: none; }
+      .grid-stats   { grid-template-columns: repeat(2, 1fr); }
+      .grid-bryan   { grid-template-columns: 200px 1fr; }
+      .track-record-col {
+        border-left: none;
+        border-top: 1.5px solid var(--ink);
+        min-width: 0;
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .grid-caps           { grid-template-columns: 1fr; }
+      .grid-beliefs        { grid-template-columns: 1fr; }
+      .grid-bryan          { grid-template-columns: 1fr; }
+      .bryan-portrait-wrap { display: none; }
+      .beliefs-border      { border-right: none; border-bottom: 1.5px solid var(--ink); }
+      .nav-links           { display: none; }
+      .hamburger-btn       { display: flex; }
+    }
   </style>
 </head>
 <body>
@@ -107,6 +147,17 @@ function scrollTo(id) {
   if (!el) return;
   const top = el.getBoundingClientRect().top + window.scrollY - 80;
   window.scrollTo({ top, behavior: 'smooth' });
+}
+
+// ── Breakpoint hook ───────────────────────────────────────────────────────────
+function useBreakpoint() {
+  const [w, setW] = React.useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  React.useEffect(() => {
+    const fn = () => setW(window.innerWidth);
+    window.addEventListener('resize', fn);
+    return () => window.removeEventListener('resize', fn);
+  }, []);
+  return { isMobile: w < 768, isTablet: w < 1024 };
 }
 
 // ── Marker ────────────────────────────────────────────────────────────────────
@@ -211,8 +262,8 @@ function ContactModal({ open, onClose, p }) {
 
   return ReactDOM.createPortal(
     <div onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-      style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(20,18,14,.45)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-      <div style={{ width: 'min(560px, 100%)', background: p.bg, color: p.fg, border: `1px solid ${p.border}`, borderRadius: 4, padding: '28px 32px 32px', ...sans, boxShadow: '0 30px 80px rgba(0,0,0,.35)', position: 'relative' }}>
+      style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(20,18,14,.45)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div style={{ width: 'min(560px, 100%)', background: p.bg, color: p.fg, border: `1px solid ${p.border}`, borderRadius: 4, padding: '28px 24px 32px', ...sans, boxShadow: '0 30px 80px rgba(0,0,0,.35)', position: 'relative' }}>
         <button onClick={onClose} aria-label="Close" style={{ position: 'absolute', top: 14, right: 14, width: 32, height: 32, borderRadius: 16, border: 'none', background: 'transparent', color: p.muted, fontSize: 18, cursor: 'pointer' }}>×</button>
 
         {!sent ? (<>
@@ -229,9 +280,9 @@ function ContactModal({ open, onClose, p }) {
             <Field label="Company"                value={form.company}  onChange={upd('company')}  p={p} />
             <Field label="What are you working on?" value={form.message} onChange={upd('message')} multiline p={p} />
             {err && <div style={{ fontSize: 13, color: '#b3261e' }}>{err}</div>}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6, gap: 12, flexWrap: 'wrap' }}>
               <span style={{ fontSize: 12, color: p.muted }}>Or email <a href={`mailto:${CONTACT.email}`} style={{ color: p.fg, textDecoration: 'underline', textUnderlineOffset: 3 }}>{CONTACT.email}</a></span>
-              <button type="submit" style={{ background: p.accent, color: '#fff', border: 'none', padding: '12px 22px', borderRadius: 2, ...sans, fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>Send message →</button>
+              <button type="submit" style={{ background: p.accent, color: '#fff', border: 'none', padding: '12px 22px', borderRadius: 2, ...sans, fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>Send →</button>
             </div>
           </form>
         </>) : (
@@ -267,19 +318,72 @@ function DarkIcon({ dark }) {
     : <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>;
 }
 
+// ── Hamburger button ──────────────────────────────────────────────────────────
+function HamburgerBtn({ open, onToggle, p }) {
+  return (
+    <button
+      className="hamburger-btn"
+      onClick={onToggle}
+      aria-label={open ? 'Close menu' : 'Open menu'}
+      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px 10px', color: p.fg, flexDirection: 'column', gap: 5 }}
+    >
+      <span style={{ width: 22, height: 2, background: p.fg, display: 'block', transition: 'transform .2s', transform: open ? 'rotate(45deg) translate(5px, 5px)' : '' }} />
+      <span style={{ width: 22, height: 2, background: p.fg, display: 'block', transition: 'opacity .2s', opacity: open ? 0 : 1 }} />
+      <span style={{ width: 22, height: 2, background: p.fg, display: 'block', transition: 'transform .2s', transform: open ? 'rotate(-45deg) translate(5px, -5px)' : '' }} />
+    </button>
+  );
+}
+
+// ── Mobile menu ───────────────────────────────────────────────────────────────
+function MobileMenu({ p, activeSection, onNavClick, onContact, onDarkToggle, dark }) {
+  return (
+    <div style={{ position: 'fixed', top: 61, left: 0, right: 0, bottom: 0, zIndex: 29, background: p.bg, borderTop: `1px solid ${p.border}`, display: 'flex', flexDirection: 'column', padding: '8px 20px 32px', overflowY: 'auto' }}>
+      {NAV_ITEMS.map((n) => (
+        <button key={n.id} onClick={() => onNavClick(n.id)} style={{ background: 'transparent', border: 'none', borderBottom: `1px solid ${p.border}`, cursor: 'pointer', padding: '18px 0', textAlign: 'left', ...sans, fontSize: 18, fontWeight: 600, color: activeSection === n.id ? p.accent : p.fg }}>
+          {n.label}
+        </button>
+      ))}
+      <div style={{ marginTop: 'auto', paddingTop: 28, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <button onClick={onDarkToggle} style={{ background: 'transparent', border: `1.5px solid ${p.border}`, cursor: 'pointer', padding: '14px 16px', ...sans, fontSize: 15, fontWeight: 500, color: p.fg, display: 'flex', alignItems: 'center', gap: 10, borderRadius: 2 }}>
+          <DarkIcon dark={dark} />
+          {dark ? 'Switch to light' : 'Switch to dark'}
+        </button>
+        <Btn primary onClick={onContact} p={p}>Get in touch →</Btn>
+      </div>
+    </div>
+  );
+}
+
 // ── App ───────────────────────────────────────────────────────────────────────
 function App() {
   const [dark,        setDark]        = React.useState(false);
   const [contactOpen, setContactOpen] = React.useState(false);
   const [activeSection, setActive]   = React.useState('top');
   const [bryanOpen,   setBryanOpen]  = React.useState(false);
+  const [menuOpen,    setMenuOpen]   = React.useState(false);
+
+  const { isMobile, isTablet } = useBreakpoint();
 
   const p   = getPalette(dark);
-  const pad = 76;
-  const gap = 124;
+  const pad = isMobile ? 20 : isTablet ? 40 : 76;
+  const gap = isMobile ? 64 : isTablet ? 88 : 124;
 
-  // Sync body background so there's no flash of wrong color
+  // Sync body background
   React.useLayoutEffect(() => { document.body.style.background = p.bg; }, [dark]);
+
+  // Inject palette CSS custom properties for use in media-query classes
+  React.useEffect(() => {
+    let el = document.getElementById('palette-vars');
+    if (!el) {
+      el = document.createElement('style');
+      el.id = 'palette-vars';
+      document.head.appendChild(el);
+    }
+    el.textContent = `:root { --ink: ${p.ink}; --accent: ${p.accent}; --bg: ${p.bg}; }`;
+  }, [p.ink, p.accent]);
+
+  // Close mobile menu on resize to desktop
+  React.useEffect(() => { if (!isMobile) setMenuOpen(false); }, [isMobile]);
 
   // Scroll-spy
   React.useEffect(() => {
@@ -298,12 +402,14 @@ function App() {
     return () => window.removeEventListener('scroll', check);
   }, []);
 
+  const handleNavClick = (id) => { scrollTo(id); setMenuOpen(false); };
+
   return (
-    <div style={{ background: p.bg, color: p.fg, ...sans, fontSize: 16, lineHeight: 1.5, minWidth: 1024 }}>
+    <div style={{ background: p.bg, color: p.fg, ...sans, fontSize: 16, lineHeight: 1.5 }}>
 
       {/* ── NAV ─────────────────────────────────────────────────────────── */}
       <header style={{ position: 'sticky', top: 0, zIndex: 30, background: p.bg, borderBottom: `1.5px solid ${p.ink}`, padding: `14px ${pad}px`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <button onClick={() => scrollTo('top')} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, color: p.fg }}>
+        <button onClick={() => { scrollTo('top'); setMenuOpen(false); }} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, color: p.fg }}>
           <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
             <rect x="2"  y="2"  width="14" height="14" fill={p.accent} />
             <rect x="18" y="2"  width="14" height="14" fill={p.ink} />
@@ -313,7 +419,8 @@ function App() {
           <span style={{ ...display, fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em' }}>CGS<span style={{ color: p.accent }}>.</span></span>
         </button>
 
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        {/* Desktop nav */}
+        <nav className="nav-links">
           {NAV_ITEMS.map((n) => (
             <button key={n.id} onClick={() => scrollTo(n.id)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '8px 14px', ...sans, fontSize: 14.5, fontWeight: 600, color: activeSection === n.id ? p.accent : p.fg, transition: 'color .15s', position: 'relative' }}>
               {n.label}
@@ -329,16 +436,29 @@ function App() {
           <div style={{ width: 8 }} />
           <Btn primary onClick={() => setContactOpen(true)} p={p}>Get in touch →</Btn>
         </nav>
+
+        {/* Mobile hamburger */}
+        <HamburgerBtn open={menuOpen} onToggle={() => setMenuOpen((o) => !o)} p={p} />
       </header>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <MobileMenu
+          p={p} dark={dark} activeSection={activeSection}
+          onNavClick={handleNavClick}
+          onContact={() => { setContactOpen(true); setMenuOpen(false); }}
+          onDarkToggle={() => setDark((d) => !d)}
+        />
+      )}
 
       {/* ── HERO ────────────────────────────────────────────────────────── */}
       <section data-sec="top" style={{ padding: `${pad - 10}px ${pad}px ${pad}px`, position: 'relative' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 60, alignItems: 'end' }}>
+        <div className="grid-hero" style={{ gap: isMobile ? 32 : 60 }}>
           <div>
             <Marker n="Channel · Strategy · Coaching" color={p.accent} />
-            <h1 style={{ ...display, fontSize: 132, lineHeight: 0.9, fontWeight: 800, margin: '0 0 32px', letterSpacing: '-0.045em' }}>
+            <h1 style={{ ...display, fontSize: 'clamp(38px, 9vw, 132px)', lineHeight: 0.9, fontWeight: 800, margin: '0 0 28px', letterSpacing: '-0.045em' }}>
               <span>Channel</span><br />
-              <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 16 }}>
+              <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 16, flexWrap: 'wrap' }}>
                 <span style={{ color: p.accent }}>growth</span>
                 <svg width="120" height="80" viewBox="0 0 120 80" aria-hidden="true" style={{ flexShrink: 0 }}>
                   <path d="M5 70 Q 35 5, 60 40 T 115 10" fill="none" stroke={p.accent2} strokeWidth="6" strokeLinecap="square" />
@@ -347,7 +467,7 @@ function App() {
               </span><br />
               <span style={{ fontStyle: 'italic', fontWeight: 500 }}>that lasts.</span>
             </h1>
-            <p style={{ ...sans, fontSize: 21, lineHeight: 1.45, color: p.muted, maxWidth: 600, margin: '0 0 40px' }}>
+            <p style={{ ...sans, fontSize: 'clamp(16px, 2vw, 21px)', lineHeight: 1.45, color: p.muted, maxWidth: 600, margin: '0 0 36px' }}>
               Two decades of channel and go-to-market experience, applied as a coach. Programs that drive measurable revenue, partnerships built to last, and a team that knows how to run it after we're gone.
             </p>
             <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -356,8 +476,8 @@ function App() {
             </div>
           </div>
 
-          {/* geometric stack */}
-          <div style={{ position: 'relative', height: 460 }}>
+          {/* geometric stack — hidden on tablet/mobile via CSS class */}
+          <div className="hero-visual">
             <div style={{ position: 'absolute', top: 0, right: 0, width: 280, height: 280, background: p.accent, transform: 'rotate(-3deg)' }} />
             <div style={{ position: 'absolute', top: 40, right: 40, width: 280, height: 280, background: p.ink, transform: 'rotate(2deg)' }} />
             <div style={{ position: 'absolute', top: 80, right: 80, width: 280, height: 280, background: p.bg, border: `1.5px solid ${p.ink}`, transform: 'rotate(-1deg)', padding: 24, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
@@ -375,10 +495,10 @@ function App() {
         </div>
 
         {/* stat band */}
-        <div style={{ marginTop: 84, display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', background: p.deepBg, color: p.deepFg }}>
+        <div className="grid-stats" style={{ marginTop: 64, background: p.deepBg, color: p.deepFg }}>
           {STATS.map((s, i) => (
-            <div key={s.l} style={{ padding: '32px 28px', borderLeft: i === 0 ? 'none' : `1px solid rgba(${p.deepFgRgb},.18)` }}>
-              <div style={{ ...display, fontSize: 56, fontWeight: 800, lineHeight: 1, marginBottom: 8, letterSpacing: '-0.03em', color: i === 1 ? p.accent2 : p.deepFg }}>{s.n}</div>
+            <div key={s.l} style={{ padding: isMobile ? '24px 16px' : '32px 28px', borderLeft: i === 0 ? 'none' : `1px solid rgba(${p.deepFgRgb},.18)` }}>
+              <div style={{ ...display, fontSize: 'clamp(28px, 4vw, 56px)', fontWeight: 800, lineHeight: 1, marginBottom: 8, letterSpacing: '-0.03em', color: i === 1 ? p.accent2 : p.deepFg }}>{s.n}</div>
               <div style={{ ...mono, fontSize: 11, letterSpacing: '.12em', textTransform: 'uppercase', color: `rgba(${p.deepFgRgb},.62)` }}>{s.l}</div>
             </div>
           ))}
@@ -388,8 +508,8 @@ function App() {
       {/* ── ABOUT ───────────────────────────────────────────────────────── */}
       <section data-sec="about" style={{ padding: `${gap}px ${pad}px`, position: 'relative' }}>
         <Marker n="01 / Who we are" color={p.accent} />
-        <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 60, alignItems: 'start', marginBottom: 72 }}>
-          <h2 style={{ ...display, fontSize: 72, lineHeight: 0.98, margin: 0, fontWeight: 700, letterSpacing: '-0.03em' }}>
+        <div className="grid-about" style={{ gap: 60, marginBottom: 72 }}>
+          <h2 style={{ ...display, fontSize: 'clamp(28px, 5vw, 72px)', lineHeight: 0.98, margin: 0, fontWeight: 700, letterSpacing: '-0.03em' }}>
             We don't do<br />slide decks. We<br />do the <span style={{ color: p.accent }}>work</span>.
           </h2>
           <div style={{ paddingTop: 14 }}>
@@ -401,16 +521,16 @@ function App() {
 
         {/* Bryan strip */}
         <div style={{ border: `1.5px solid ${p.ink}`, background: p.bg }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr auto', alignItems: 'stretch' }}>
-            {/* portrait */}
-            <div style={{ aspectRatio: '1/1', position: 'relative', background: p.bg }}>
+          <div className="grid-bryan">
+            {/* portrait — hidden on mobile via CSS class */}
+            <div className="bryan-portrait-wrap" style={{ aspectRatio: '1/1', position: 'relative', background: p.bg }}>
               <BryanPortrait />
               <div style={{ position: 'absolute', top: 14, left: 14, zIndex: 2, ...mono, fontSize: 10, letterSpacing: '.14em', textTransform: 'uppercase', background: p.deepBg, color: p.deepFg, padding: '4px 8px' }}>Founder</div>
             </div>
             {/* bio */}
             <div style={{ padding: '32px 36px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <div style={{ ...mono, fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: p.accent, marginBottom: 8 }}>Meet</div>
-              <h3 style={{ ...display, fontSize: 44, fontWeight: 700, margin: '0 0 12px', letterSpacing: '-0.025em' }}>Bryan Keepers</h3>
+              <h3 style={{ ...display, fontSize: 'clamp(24px, 3.5vw, 44px)', fontWeight: 700, margin: '0 0 12px', letterSpacing: '-0.025em' }}>Bryan Keepers</h3>
               <p style={{ ...sans, fontSize: 15.5, lineHeight: 1.6, color: p.muted, margin: 0, maxWidth: 600 }}>
                 {bryanOpen ? BRYAN.bio : `${BRYAN.bio.slice(0, 200)}…`}
               </p>
@@ -418,8 +538,8 @@ function App() {
                 {bryanOpen ? '— Show less' : '+ Read full bio'}
               </button>
             </div>
-            {/* track record */}
-            <div style={{ borderLeft: `1.5px solid ${p.ink}`, padding: '24px 28px', background: p.subtle, minWidth: 280 }}>
+            {/* track record — border handled by CSS class using var(--ink) */}
+            <div className="track-record-col" style={{ background: p.subtle }}>
               <div style={{ ...mono, fontSize: 10.5, letterSpacing: '.14em', textTransform: 'uppercase', color: p.muted, marginBottom: 16 }}>Track record</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <Step label="Wasp Barcode Technologies" sub="Channel sales & marketing" p={p} />
@@ -430,7 +550,7 @@ function App() {
           </div>
 
           {/* expertise band */}
-          <div style={{ borderTop: `1.5px solid ${p.ink}`, padding: '24px 36px', background: p.deepBg, color: p.deepFg }}>
+          <div style={{ borderTop: `1.5px solid ${p.ink}`, padding: isMobile ? '20px' : '24px 36px', background: p.deepBg, color: p.deepFg }}>
             <div style={{ ...mono, fontSize: 10.5, letterSpacing: '.14em', textTransform: 'uppercase', color: `rgba(${p.deepFgRgb},.55)`, marginBottom: 14 }}>Areas of expertise · 11</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {BRYAN.expertise.map((e, i) => (
@@ -448,11 +568,11 @@ function App() {
         </svg>
         <div style={{ position: 'relative' }}>
           <Marker n="02 / Capabilities" color={p.cream} />
-          <h2 style={{ ...display, fontSize: 80, lineHeight: 0.98, fontWeight: 700, margin: '0 0 18px', maxWidth: 1000, letterSpacing: '-0.035em' }}>Four ways<br />we get to work.</h2>
-          <p style={{ ...sans, fontSize: 18, lineHeight: 1.5, color: `rgba(${p.creamRgb},.85)`, maxWidth: 580, margin: '0 0 64px' }}>
+          <h2 style={{ ...display, fontSize: 'clamp(28px, 5.5vw, 80px)', lineHeight: 0.98, fontWeight: 700, margin: '0 0 18px', maxWidth: 1000, letterSpacing: '-0.035em' }}>Four ways<br />we get to work.</h2>
+          <p style={{ ...sans, fontSize: 18, lineHeight: 1.5, color: `rgba(${p.creamRgb},.85)`, maxWidth: 580, margin: '0 0 48px' }}>
             Every engagement is sized to the moment — these are the four practice areas, often blended two or three at a time depending on where the program is in its lifecycle.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 24 }}>
+          <div className="grid-caps" style={{ gap: 24 }}>
             {WHAT_WE_DO.map((c, i) => (
               <div key={c.t} style={{ background: p.cardBg, color: p.cardFg, padding: '32px 32px 28px', minHeight: 220, display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
@@ -475,12 +595,13 @@ function App() {
       {/* ── BELIEFS ──────────────────────────────────────────────────────── */}
       <section data-sec="beliefs" style={{ padding: `${gap}px ${pad}px` }}>
         <Marker n="03 / Beliefs" color={p.accent} />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', border: `1.5px solid ${p.ink}` }}>
-          <div style={{ padding: '40px 40px 48px', borderRight: `1.5px solid ${p.ink}`, background: p.accent2, color: p.cream }}>
+        <div className="grid-beliefs" style={{ border: `1.5px solid ${p.ink}` }}>
+          {/* border-right handled by CSS class using var(--ink) */}
+          <div className="beliefs-border" style={{ padding: isMobile ? '32px 24px' : '40px 40px 48px', background: p.accent2, color: p.cream }}>
             <div style={{ ...mono, fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', marginBottom: 22, opacity: .8 }}>Mission</div>
-            <p style={{ ...display, fontSize: 38, lineHeight: 1.12, margin: 0, fontWeight: 700, letterSpacing: '-0.02em' }}>{MISSION}</p>
+            <p style={{ ...display, fontSize: 'clamp(22px, 3vw, 38px)', lineHeight: 1.12, margin: 0, fontWeight: 700, letterSpacing: '-0.02em' }}>{MISSION}</p>
           </div>
-          <div style={{ padding: '40px 40px 48px' }}>
+          <div style={{ padding: isMobile ? '32px 24px' : '40px 40px 48px' }}>
             <div style={{ ...mono, fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: p.accent, marginBottom: 22 }}>Values</div>
             <p style={{ ...sans, fontSize: 17, lineHeight: 1.65, margin: 0, color: p.fg }}>{VALUES}</p>
           </div>
@@ -495,13 +616,13 @@ function App() {
           <rect x="2"  y="52" width="46" height="46" fill="none" stroke={p.cream} strokeWidth="1" />
           <rect x="52" y="52" width="46" height="46" fill={p.cream} />
         </svg>
-        <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 64, alignItems: 'end' }}>
+        <div className="grid-contact" style={{ position: 'relative', gap: isMobile ? 40 : 64 }}>
           <div>
             <Marker n="04 / Get in touch" color={p.accent} />
-            <h2 style={{ ...display, fontSize: 108, lineHeight: 0.94, fontWeight: 800, margin: '0 0 24px', letterSpacing: '-0.04em' }}>
+            <h2 style={{ ...display, fontSize: 'clamp(34px, 7vw, 108px)', lineHeight: 0.94, fontWeight: 800, margin: '0 0 24px', letterSpacing: '-0.04em' }}>
               Let's<br /><span style={{ color: p.accent }}>build</span> something.
             </h2>
-            <p style={{ ...sans, fontSize: 19, lineHeight: 1.5, color: `rgba(${p.creamRgb},.7)`, margin: '0 0 36px', maxWidth: 500 }}>
+            <p style={{ ...sans, fontSize: 'clamp(15px, 1.8vw, 19px)', lineHeight: 1.5, color: `rgba(${p.creamRgb},.7)`, margin: '0 0 36px', maxWidth: 500 }}>
               A 30-minute working session, no slides. Bring the parts of the program you're not sure about.
             </p>
             <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -518,7 +639,7 @@ function App() {
       </section>
 
       {/* ── FOOTER ───────────────────────────────────────────────────────── */}
-      <footer style={{ padding: `30px ${pad}px`, background: p.deepBg, color: `rgba(${p.deepFgRgb},.6)`, borderTop: `1px solid rgba(${p.deepFgRgb},.15)`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', ...mono, fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase' }}>
+      <footer style={{ padding: `30px ${pad}px`, background: p.deepBg, color: `rgba(${p.deepFgRgb},.6)`, borderTop: `1px solid rgba(${p.deepFgRgb},.15)`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, ...mono, fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase' }}>
         <span>Channel Growth Strategies, LLC</span>
         <span>© {new Date().getFullYear()}</span>
       </footer>
